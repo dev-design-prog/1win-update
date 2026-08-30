@@ -325,9 +325,15 @@ def create_app():
     import os
     webapp_path = os.path.join(os.path.dirname(__file__), "..", "webapp")
     webapp_path = os.path.abspath(webapp_path)
+    index_path = os.path.join(webapp_path, "index.html")
+
+    async def serve_index(request):
+        with open(index_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        return web.Response(text=content, content_type="text/html", charset="utf-8")
     
     app = web.Application()
-    app.router.add_route("GET", "/", lambda r: web.FileResponse(os.path.join(webapp_path, "index.html")))
+    app.router.add_route("GET", "/", serve_index)
     app.router.add_get("/api/user", get_user)
     app.router.add_post("/api/slots/play", play_slots)
     app.router.add_post("/api/mines/play", play_mines)
